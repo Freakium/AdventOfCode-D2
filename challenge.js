@@ -1,5 +1,3 @@
-/* I only wanted to find the solution so there are no functions */
-
 // List of reports as arrays
 let reports = [
   [90,91,93,96,93],
@@ -1004,14 +1002,12 @@ let reports = [
   [28,27,24,22,19]
 ];
 
-let safe = 0;
-reports.forEach(arr => {
+// checks report validity
+let checkValidity = (arr, dampenerEngaged) => {
   // This assumes each report has at least 2 levels
   let prev = arr[0];
   let isIncrease = prev < arr[1];
 
-  // all reports are safe until proven unsafe
-  let isSafe = true;
   for(let i = 1; i < arr.length; i++) {
     // test for incremental, decremental, and levels are within margin of 3
     let current = arr[i];
@@ -1021,15 +1017,34 @@ reports.forEach(arr => {
       || (!isIncrease && (current > prev || margin < -3)
       || prev == current)
     ) {
-      isSafe = false;
-      break;
+      // report fails since dampener already engaged
+      if(dampenerEngaged) {
+        console.log('FAIL', arr);
+        return false;
+      }
+      // engage the dampener
+      else {
+        console.log('ORIGINAL', arr);
+        arr.splice(i, 1);
+        let test = checkValidity(arr, true);
+        if(test) {
+          console.log('SHIPOOPI', arr);
+        }
+        return test;
+      }
     }
 
     prev = current;
   }
 
-  // SAFE!
-  if(isSafe) {
+  // report is good if we've reached this point
+  return true;
+}
+
+let safe = 0;
+reports.forEach(arr => {
+  // call checkValidity function
+  if(checkValidity(arr, false)) {
     safe++;
   }
 });
