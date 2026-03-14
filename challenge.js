@@ -1003,7 +1003,7 @@ let reports = [
 ];
 
 // checks report validity
-let checkValidity = (arr, dampenerEngaged) => {
+let checkValidity = (arr) => {
   // This assumes each report has at least 2 levels
   let prev = arr[0];
   let isIncrease = prev < arr[1];
@@ -1017,21 +1017,7 @@ let checkValidity = (arr, dampenerEngaged) => {
       || (!isIncrease && (current > prev || margin < -3)
       || prev == current)
     ) {
-      // report fails since dampener already engaged
-      if(dampenerEngaged) {
-        console.log('FAIL', arr);
-        return false;
-      }
-      // engage the dampener
-      else {
-        console.log('ORIGINAL', arr);
-        arr.splice(i, 1);
-        let test = checkValidity(arr, true);
-        if(test) {
-          console.log('SHIPOOPI', arr);
-        }
-        return test;
-      }
+      return false;
     }
 
     prev = current;
@@ -1044,8 +1030,19 @@ let checkValidity = (arr, dampenerEngaged) => {
 let safe = 0;
 reports.forEach(arr => {
   // call checkValidity function
-  if(checkValidity(arr, false)) {
+  if(checkValidity(arr)) {
     safe++;
+  }
+  // check if removing a single level from the entire report will make it safe
+  else {
+    for(let i = 0; i < arr.length; i++) {
+      let temp = [...arr];
+      temp.splice(i, 1);
+      if(checkValidity(temp)) {
+        safe++;
+        break;
+      }
+    }
   }
 });
 
